@@ -1,20 +1,26 @@
-const rect = require('./rectangle');
+const express = require('express')
+const http = require('http')
+const morgan = require('morgan')
+const bodyParser = require('body-parser')
+const dishRouter = require('./routes/dishRouter')
+const promoRouter = require('./routes/promoRouter')
+const leaderRouter = require('./routes/leaderRouter')
 
-function solveRect(l, b) {
-  console.log(`>> Solving for rectangle with l = ${l} and b = ${b}`);
+const hostname = 'localhost'
+const port = 3000
 
-  rect(l, b, (err, rectangle) => {
-    if (err) {
-      console.log('ERROR:', err.message);
-    } else {
-      console.log(`>> The area of a rectangle of dimensions length = ${l} and breadth = ${b} is ${rectangle.area()}`);
-      console.log(`>> The perimeter of a rectangle of dimensions length = ${l} and breadth = ${b} is ${rectangle.perimeter()}`);
-    }
-  });
-  console.log('>> This statement is logged after the call to rect()');
-}
+const app = express()
 
-solveRect(2, 4);
-solveRect(3, 5);
-solveRect(0, 5);
-solveRect(-3, 5);
+app.use(morgan('dev'))
+
+app.use(express.static(__dirname + '/public'))
+app.use(bodyParser.json())
+app.use('/dishes', dishRouter)
+app.use('/promotions', promoRouter)
+app.use('/leaders', leaderRouter)
+
+const server = http.createServer(app)
+
+server.listen(port, hostname, () => {
+  console.log(`Server running at http://${hostname}:${port}/`)
+})
